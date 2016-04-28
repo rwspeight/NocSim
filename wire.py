@@ -4,6 +4,8 @@ from math import cos
 from math import sin
 from math import degrees
 from bisect import bisect
+from bisect import bisect_left
+from bisect import bisect_right
 # http://networkx.readthedocs.org/en/stable/index.html
 import networkx as nx
 # http://matplotlib.org/1.5.1/contents.html
@@ -31,7 +33,11 @@ class Wire:
 		self.x_interval.sort()
 
 		self.y_interval = [self.y, self.wire_end[1]]
-		self.y_interval.sort()		
+		self.y_interval.sort()
+
+		mid_x = self.x_interval[0] + (self.x_interval[1] - self.x_interval[0]) / 2
+		mid_y = self.y_interval[0] + (self.y_interval[1] - self.y_interval[0]) / 2
+		self.midpoint = (round(mid_x, 9), round(mid_y, 9))		
 		
 
 	def get_intersection(self, wire):
@@ -125,6 +131,57 @@ class Helpers:
 		w = w + [Wire(math.pi / 2, column, 0, length) for column in range(0, columns)]
 		return w
 
+class WireRegionIndex:
+
+	def __init__(self):
+		self.xs = []
+		self.wires_by_x = []
+		self.ys = []
+		self.wires_by_y = []
+		self.longest_length = 0
+	
+	def add(self, wire):
+		# Make it unique in case this is a verticle line
+		xs = list(set([wire.x, wire.wire_end[0]]))
+		xs.sort()
+		
+		for x in xs:
+			index = bisect(self.xs, x)
+			self.xs.insert(index, x)
+			self.wires_by_x.insert(index, wire)			
+
+		# Make it unique in case this is a horizontal line
+		ys = list(set([wire.y, wire.wire_end[1]]))
+		ys.sort()
+		
+		for y in ys:
+			index = bisect(self.ys, y)
+			self.ys.insert(index, y)
+			self.wires_by_y.insert(index, wire)			
+
+		self.longest_length = max(self.longest_length, wire.length)
+
+	def get_neighbors(self, wire):
+		half_length = self.longest_length / 2
+		left = wire.midpoint[0] - half_length
+		right = wire.midpoint[0] + half_length
+
+		left_index = bisect_left(self.xs, left)
+		right_index = bisect_right(self.xs, right)
+		wires_from_x = set(self.wires_by_x[left_index:right_index])
+
+		top = wire.midpoint[1] - half_length
+		bottom = wire.midpoint[1] + half_length
+
+		left_index = bisect_left(self.ys, top)
+		right_index = bisect_right(self.ys, bottom)
+		wires_from_y = set(self.wires_by_y[left_index:right_index])
+
+		wires = list(wires_from_x.intersection(wires_from_y))
+		if wire in wires:
+			wires.remove(wire)
+
+		return wires
 
 
 
