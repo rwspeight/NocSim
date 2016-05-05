@@ -49,4 +49,22 @@ class AnalysisResult:
 		self.total_wire_length = 0		
 
 	def __str__(self):
-		return "{0},{1},{2},{3},{4}".format(self.wire_count, self.largest_graph_node_count, self.average_shortest_path_length, self.disconnected_node_count, self.total_wire_length)	
+		return self.to_csv()
+
+	def to_csv(self):		
+		return "{0},{1},{2},{3},{4}".format(
+			self.wire_count,
+			self.largest_graph_node_count,
+			self.average_shortest_path_length,
+			self.disconnected_node_count,
+			self.total_wire_length)	
+
+	def from_csv(self, line):
+		values = line.split(",")
+
+		self.wire_count = values[0]
+		self.largest_graph_node_count = values[1]
+		self.average_shortest_path_length = values[2]
+		self.disconnected_node_count = values[3]
+		self.total_wire_length = values[4]
+

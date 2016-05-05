@@ -1,50 +1,37 @@
 #!/usr/bin/python
-import factories as f
-import generators as g
-import visualize as v
-import analyze as a
-import math
+from argparse import ArgumentParser as ap
+from generators import get_distributions
+from simulate import simulate
 
 
-##################
-min_count = 100
-max_count = 1000
-count_step = 50
-counts = range(min_count, max_count, count_step)
-trials = 1
-min_length = 5
-max_length = 15
-grid_size = max_length * 10
+p = ap(
+	prog="sandbox", epilog="="*60,
+	description="NoC random assembly modeling simulation.")
 
-#lg = g.get_basic_length_generator(max_length, min_length)
-lg = g.get_exponential_decay_length_generator(math.e, 2, max_length, min_length)
-pg = g.get_uniform_position_generator(grid_size)
-ag = g.get_uniform_angle_generator()
-factory = f.NocFactory(f.WireFactory(lg, pg, ag))
+p.add_argument(
+	"-w", "--wires", dest="wire_range", nargs=2, type=int,
+	metavar=("{from}", "{to}"), help="Wire count range.")
 
-results = []
-for count in counts:	
-	noc = factory.create(count)
-	noc.create_graph()
-		
-	result = a.get_stats(noc)
-	result.wire_count = count
-	print result
-	results.append(result)
+p.add_argument(
+	"-l", "--lengths", dest="length_range", nargs=2, type=int,
+	metavar=("{from}", "{to}"), help="Wire length range.")
 
-	averages = a.AnalysisResult()
-	results.append(averages)
+p.add_argument(
+	"-s", "--step", nargs=1, dest="step", type=int,
+	metavar="{step}", help="Wire count range step size")
 
-#v.plot_disconnected_nodes_vs_wire_count(results)
-#v.plot_largest_graph_vs_wire_count(results)	
-v.plot_average_shortest_path_vs_wire_count(results)
-	#averages.wire_count = count
-	#averages.largest_graph_node_count = sum(t.largest_graph_node_count for t in trials) / len(trials)
-	#averages.average_shortest_path_length = sum(t.average_shortest_path_length for t in trials) / len(trials)
-	#averages.disconnected_node_count = sum(t.disconnected_node_count for t in trials) / len(trials)
-	#averages.total_wire_length = sum(t.total_wire_length for t in trials) / len(trials)
+p.add_argument(
+	"-W", "--width", nargs=1, dest="width", type=int,
+	metavar="{width}", help="Width of the N x N chip to simulate")
 
+p.add_argument(
+	"-t", "--trials", nargs=1, dest="trials", type=int,
+	metavar="{trails}", help="Number of trials to run with the given parameters")
 
+p.add_argument(
+	"-d", "--dist", nargs=1, dest="distribution", type=str,
+	help="Wire distribution to use.", 
+	choices=[k for k in dict(get_distributions())])
 
-# Concurrent features
-# https://docs.python.org/dev/library/concurrent.futures.html
+simulate(p.parse_args())
+

@@ -1,6 +1,19 @@
-- Get shortest path
-- graph as a function of distribution
-- get shortest wire length'
-- run "sweep" with this information
-- check into github
-- provide link
+* combine plots
+* wider domain
+* error bars
+* aggregate functions
+	- y = a*max_size+ (1 - a)*num_components
+	- Normalize each term : divide by maximum
+	- a is weight parameter
+	- weighting of choices to show optimizations
+	- plot range of a's to s
+* minimize shortest path and lowest cost (least wire length)
+	- Example:  N = 1000 nodes  largest graph while minimizing
+* distribution
+	- try gaussian
+	- 
+* Get it woring for 10k wires
+* Try finding an optimum parameter set for a particular distribution
+	- i.e what a and b for a Guassian will minimize cost and 
+* Email Christof example plots
+* 

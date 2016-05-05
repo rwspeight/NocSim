@@ -28,3 +28,7 @@ def get_exponential_decay_length_generator(base, time_constant, max_length, min_
 		threshold = control_curve(length)
 		if threshold <= random():
 			yield min_length + length	
+
+def get_distributions():
+	yield ("uniform", get_uniform_length_generator)
+	yield ("exponential", get_exponential_decay_length_generator)
