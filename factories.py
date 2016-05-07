@@ -10,9 +10,9 @@ class WireFactory:
 
 	def create(self):
 
-		angle = self.angle_generator.next()
-		position = self.position_generator.next()
-		length = self.length_generator.next()	
+		angle = next(self.angle_generator)
+		position = next(self.position_generator)
+		length = next(self.length_generator)
 		
 		return Wire(angle, *position, length = length)
 

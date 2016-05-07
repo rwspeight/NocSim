@@ -1,6 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import analyze as a
+import statistics as s
+from math import sqrt
 
 def draw_noc(noc, axes = None, node_size = 10):
 	draw_graph(noc.graph, axes, node_size)
@@ -31,12 +33,18 @@ def plot_disconnected_nodes_vs_wire_count(trials):
 	plt.xlabel('Wire Count')
 	plt.ylabel('Disconnected Nodes')
 
-	for results in trials:
-		xs = [r.wire_count for r in results]
-		ys = [float(r.disconnected_node_count) / max(1, r.wire_count) for r in results]
-		
-		plt.plot(xs, ys, 'o')
-	plt.savefig('disconnected.png')
+	xs = [r.wire_count for r in trials[0]]
+	data_points = len(trials[0])
+	data_points_root = sqrt(data_points)
+	transpose = [ [t[n].disconnected_node_count for t in trials] for n in range(data_points)]
+	means = [s.mean(x) for x in transpose]
+	stdev = [s.stdev(x) for x in transpose]
+	stderr = [x / data_points_root for x in stdev]
+
+	plt.errorbar(xs, means, yerr=stderr, marker="o", color="black")
+	
+	#plt.plot(xs, ys, 'o')
+	#plt.savefig('disconnected.png')
 	plt.show()
 
 def plot_largest_graph_vs_wire_count(trials):
@@ -53,7 +61,7 @@ def plot_largest_graph_vs_wire_count(trials):
 		plt.plot(xs, ys, 'o')	
 	
 	plt.savefig('largest.png')
-	plt.show()
+	#plt.show()
 
 def plot_average_shortest_path_vs_wire_count(trials):
 	fig = plt.figure()
@@ -68,5 +76,5 @@ def plot_average_shortest_path_vs_wire_count(trials):
 		plt.plot(xs, ys, 'o')
 
 	plt.savefig('shortest.png')
-	plt.show()
+	#plt.show()
 	

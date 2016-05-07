@@ -21,8 +21,9 @@ def get_disconnected_node_count(prime_graph, sub_graphs):
 
 	return sum([nx.number_of_nodes(n) for n in sub_graphs])
 
-def get_stats(noc):
+def get_stats(noc, count):
 	result = AnalysisResult()
+	result.count = count
 	result.wire_count = len(noc.wires)
 
 	sub_graphs = get_sub_graphs(noc.graph)
@@ -37,7 +38,7 @@ def get_stats(noc):
 	
 	result.disconnected_node_count = get_disconnected_node_count(largest, sub_graphs)
 	result.total_wire_length = sum(e[2]["length"] for e in noc.edges)
-	print result
+	print(result)
 	return result
 
 class AnalysisResult:
@@ -48,7 +49,7 @@ class AnalysisResult:
 		self.disconnected_node_count = 0
 		self.total_wire_length = 0		
 
-	def __str__(self):
+	def __str__(self): 		
 		return self.to_csv()
 
 	def to_csv(self):		

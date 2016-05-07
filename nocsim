@@ -1,37 +1,43 @@
-#!/usr/bin/python
+#!/usr/local/bin/python3
 from argparse import ArgumentParser as ap
 from generators import get_distributions
 from simulate import simulate
 
-
+# Note:  nargs=1 produces and array where leaving nargs unspecified
+# produces a scalar value
 p = ap(
 	prog="sandbox", epilog="="*60,
 	description="NoC random assembly modeling simulation.")
 
 p.add_argument(
-	"-w", "--wires", dest="wire_range", nargs=2, type=int,
+	"-w", "--wires", dest="wire_range", nargs=2, type=int, required=True,
 	metavar=("{from}", "{to}"), help="Wire count range.")
 
 p.add_argument(
-	"-l", "--lengths", dest="length_range", nargs=2, type=int,
+	"-l", "--lengths", dest="length_range", nargs=2, type=int, required=True,
 	metavar=("{from}", "{to}"), help="Wire length range.")
 
 p.add_argument(
-	"-s", "--step", nargs=1, dest="step", type=int,
+	"-s", "--step", dest="step", type=int, required=True,
 	metavar="{step}", help="Wire count range step size")
 
 p.add_argument(
-	"-W", "--width", nargs=1, dest="width", type=int,
+	"-W", "--width", dest="width", type=int, required=True,
 	metavar="{width}", help="Width of the N x N chip to simulate")
 
 p.add_argument(
-	"-t", "--trials", nargs=1, dest="trials", type=int,
+	"-t", "--trials", dest="trials", type=int, required=True,
 	metavar="{trails}", help="Number of trials to run with the given parameters")
 
 p.add_argument(
-	"-d", "--dist", nargs=1, dest="distribution", type=str,
+	"-d", "--dist", dest="distribution", type=str, required=True,
 	help="Wire distribution to use.", 
 	choices=[k for k in dict(get_distributions())])
+
+p.add_argument(
+	"-p", "--params", nargs="*", dest="distribution_parameters", required=False,
+	metavar="p", help="Parameters passed to the specified distribution",
+	default=[])
 
 simulate(p.parse_args())
 
