@@ -2,6 +2,9 @@
 from argparse import ArgumentParser as ap
 from generators import get_distributions
 from simulate import simulate
+from visualize import visualize
+from inout import import_from_csv
+from itertools import groupby
 
 # Note:  nargs=1 produces and array where leaving nargs unspecified
 # produces a scalar value
@@ -19,15 +22,15 @@ p.add_argument(
 
 p.add_argument(
 	"-s", "--step", dest="step", type=int, required=True,
-	metavar="{step}", help="Wire count range step size")
+	metavar="{step}", help="Wire count range step size.")
 
 p.add_argument(
-	"-W", "--width", dest="width", type=int, required=True,
-	metavar="{width}", help="Width of the N x N chip to simulate")
+	"-W", "--width", dest="grid_width", type=int, required=True,
+	metavar="{width}", help="Width of the N x N chip to simulate.")
 
 p.add_argument(
-	"-t", "--trials", dest="trials", type=int, required=True,
-	metavar="{trails}", help="Number of trials to run with the given parameters")
+	"-t", "--trials", dest="trials", type=int, default=1,
+	metavar="{trails}", help="Number of trials to run with the given parameters.")
 
 p.add_argument(
 	"-d", "--dist", dest="distribution", type=str, required=True,
@@ -35,9 +38,48 @@ p.add_argument(
 	choices=[k for k in dict(get_distributions())])
 
 p.add_argument(
-	"-p", "--params", nargs="*", dest="distribution_parameters", required=False,
-	metavar="p", help="Parameters passed to the specified distribution",
+	"-dp", "--dparams", dest="distribution_parameters", nargs="*",
+	metavar="p", help="Parameters passed to the specified distribution.",
 	default=[])
 
-simulate(p.parse_args())
+p.add_argument(
+	"-o", "--output", dest="output_file", type=str,
+	metavar="{file}", help="File to save CSV-formated result data to.")
+
+p.add_argument(
+	"-v", "--visualize", nargs="?", const=True, dest="visualize", type=bool,
+	metavar="", default=False, help="Visualize the data after generation.")
+
+p.add_argument(
+	"-i", "--input", dest="input_file", type=str,
+	metavar="{input}", help="File to input CSV-formatted result data from and visualize.")
+
+#=====================
+
+params = p.parse_args()
+
+if not params.input_file:
+	simulate(params)
+
+elif params.visualize:
+	get_key = lambda r: r.trial
+
+	results = list(import_from_csv(params.input_file))	
+	results = sorted(results, key=get_key)
+	
+	trials = []
+	for k, g in groupby(results, get_key):		
+		trial = list(g)
+		if len(trial) > 0:			
+			trials.append(trial)
+
+	lens = [len(t) for t in trials]
+	if min(lens) != max(lens):
+		print("\nError:  Not all trials have the same number of data points.  Cannot impot.\n")
+	else:
+		visualize(trials)
+
+
+
+
 

@@ -34,14 +34,32 @@ def plot_disconnected_nodes_vs_wire_count(trials):
 	plt.ylabel('Disconnected Nodes')
 
 	xs = [r.wire_count for r in trials[0]]
+	trial_count = len(trials)
 	data_points = len(trials[0])
-	data_points_root = sqrt(data_points)
+	
 	transpose = [ [t[n].disconnected_node_count for t in trials] for n in range(data_points)]
 	means = [s.mean(x) for x in transpose]
-	stdev = [s.stdev(x) for x in transpose]
-	stderr = [x / data_points_root for x in stdev]
 
-	plt.errorbar(xs, means, yerr=stderr, marker="o", color="black")
+	# There's a bug in errorbar() when called without fmt=None that
+	# causes connecting lines to be drawn between data points.  This creates
+	# a significant amount of visual noise.  The page below says it was
+	# supposed to be fixed in 1.4 and higher, but this doesn't seem to be
+	# the cases or I haven't configured the module import correctly.
+	# An alternate solution is to draw the data points and the errorbars 
+	# separately as is done below.  The error bars seems to be slightly off
+	# center, but it's better than the alternative.
+	# See:  http://stackoverflow.com/questions/18498742/how-do-you-make-an-errorbar-plot-in-matplotlib-using-linestyle-none-in-rcparams	
+	plt.plot(xs, means, "ok")
+
+	# Calculate the standard error for each x's seqence of 
+	# y values.  There must be at least two data points or exceptions
+	# are thrown.
+	# See:  https://en.wikipedia.org/wiki/Standard_error	
+	if trial_count >= 2:
+		data_points_root = sqrt(trial_count)
+		stdev = [s.stdev(x) for x in transpose]
+		stderr = [x / data_points_root for x in stdev]
+		plt.errorbar(xs, means, yerr=stderr, color="black", fmt=None)
 	
 	#plt.plot(xs, ys, 'o')
 	#plt.savefig('disconnected.png')
@@ -77,4 +95,9 @@ def plot_average_shortest_path_vs_wire_count(trials):
 
 	plt.savefig('shortest.png')
 	#plt.show()
+
+def visualize(trials):
+	plot_disconnected_nodes_vs_wire_count(trials)
+	plot_largest_graph_vs_wire_count(trials)	
+	plot_average_shortest_path_vs_wire_count(trials)
 	
