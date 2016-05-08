@@ -25,6 +25,16 @@ def simulate(params):
 			noc = factory.create(drop_count)
 			noc.create_graph()
 				
+			# Save the image of the NoC if requested
+			if params.graph_save_path:
+				s = "{0}/{1}_trial{2}_count{3}.png"
+				path = s.format(					
+					params.graph_save_path, 
+					params.distribution,
+					trial, 
+					drop_count)
+				v.save_noc_image(noc, path)
+
 			result = a.get_stats(noc, drop_count, trial)
 			results.append(result)
 

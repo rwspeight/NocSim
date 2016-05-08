@@ -54,6 +54,10 @@ p.add_argument(
 	"-i", "--input", dest="input_file", type=str,
 	metavar="{input}", help="File to input CSV-formatted result data from and visualize.")
 
+p.add_argument(
+	"-gsp", "--graph-save-path", dest="graph_save_path", type=str,
+	metavar="{path}", help="Path to save images of all generated graphs to.  Leave blank to skip image generation.")
+
 #=====================
 
 params = p.parse_args()

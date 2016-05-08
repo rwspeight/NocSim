@@ -13,19 +13,32 @@ def draw_graph(graph, axes = None, node_size = 10):
 
 	positions = {xy: xy for xy in nx.nodes(graph)}		
 	nx.draw(graph, positions, ax=axes, node_size=node_size)
-	
 
-def show_noc_and_largest_graph(noc, node_size = 10):
+def save_noc_image(noc, path, title=None):
+	
+	# Reset the global plot
+	plt.clf()
+	if not title:
+		title = path
+
+	draw_noc_and_largest_graph(noc, title=title)
+	plt.savefig(path)	
+
+def draw_noc_and_largest_graph(noc, node_size = 10, title=None):
+	if title:
+		fig = plt.figure()
+		fig.suptitle(title)
+
 	axes = plt.subplot(121)
+	axes.set_title("All NoC Connected Graphs")
 	draw_noc(noc, axes, node_size)
 
+	axes = plt.subplot(122)
+	axes.set_title("Largest NoC Connected Graph")
 	sub_graphs = a.get_sub_graphs(noc.graph)
-	largest = a.get_largest_sub_graph(sub_graphs)
-	if largest:
-		axes = plt.subplot(122)
-		draw_graph(largest, axes, node_size)	
-
-	plt.show()	
+	largest = a.get_largest_sub_graph(sub_graphs)	
+	if largest:		
+		draw_graph(largest, axes, node_size)
 
 def plot_disconnected_nodes_vs_wire_count(trials):
 	fig = plt.figure()
@@ -36,7 +49,9 @@ def plot_disconnected_nodes_vs_wire_count(trials):
 	xs = [r.wire_count for r in trials[0]]
 	trial_count = len(trials)
 	data_points = len(trials[0])
-	
+
+	#if not all()
+
 	transpose = [ [t[n].disconnected_node_count for t in trials] for n in range(data_points)]
 	means = [s.mean(x) for x in transpose]
 
