@@ -58,6 +58,10 @@ p.add_argument(
 	"-gsp", "--graph-save-path", dest="graph_save_path", type=str,
 	metavar="{path}", help="Path to save images of all generated graphs to.  Leave blank to skip image generation.")
 
+p.add_argument(
+	"-a", "--animate-graph-creation", nargs="?", const=True, dest="anitmate_graph_creation", type=bool,
+	metavar="", default=False, help="Create an animation of the graph network growth over time.")
+
 #=====================
 
 params = p.parse_args()

@@ -14,9 +14,18 @@ def simulate(params):
 	#lg = g.get_exponential_decay_length_generator(math.e, 2, max_length, min_length)
 	lengths = dist( *(params.length_range + params.distribution_parameters) )
 	positions = g.get_uniform_position_generator(params.grid_width)
-	angles = g.get_uniform_angle_generator()
-	factory = f.NocFactory(f.WireFactory(lengths, positions, angles))
+	angles = g.get_uniform_angle_generator()	
+	
+	# Setup graph animator if requested.
+	after_add = None
+	if params.anitmate_graph_creation:
+		animation = v.GraphCreationAnimator()
+		after_add = lambda *args: animation.add_graph(*args)
 
+	wire_factory = f.WireFactory(lengths, positions, angles)
+	factory = f.NocFactory(wire_factory, after_add=after_add)
+
+	# Generate the NoC 
 	trials = []
 	for trial in range(0, params.trials):
 		results = []
@@ -40,6 +49,8 @@ def simulate(params):
 
 		trials.append(results)
 
+	if params.anitmate_graph_creation:
+		animation.create_animation("graph.mp4")
 
 	# Save results if requested
 	if params.output_file != None:

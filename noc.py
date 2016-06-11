@@ -34,6 +34,7 @@ class Noc:
 	def create_graph(self):
 		self.graph = nx.Graph()
 		self.graph.add_edges_from(self.edges)
+		return self.graph
 
 
 
